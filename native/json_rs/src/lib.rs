@@ -63,7 +63,7 @@ impl<'t> serde::Serialize for SerdeTerm<'t> {
             }
             rustler::TermType::Atom => {
                 if self.0.as_c_arg() == rustler::types::atom::nil().as_c_arg() {
-                    return serializer.serialize_none();
+                    return serializer.serialize_unit();
                 }
                 if self.0.as_c_arg() == rustler::types::atom::true_().as_c_arg() {
                     return serializer.serialize_bool(true);

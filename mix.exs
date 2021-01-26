@@ -24,7 +24,7 @@ defmodule JsonRs.MixProject do
   defp deps do
     [
       {:benchee, "~> 1.0", only: [:dev, :bench]},
-      {:jason, "~> 1.2", only: [:dev, :bench]},
+      {:jason, "~> 1.2", only: [:dev, :test, :bench]},
       {:rustler, "~> 0.22.0-rc.0"}
     ]
   end

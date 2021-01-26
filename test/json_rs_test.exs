@@ -50,4 +50,9 @@ defmodule JsonRsTest do
     assert {:ok, "14000000000.0"} = JsonRs.encode(1.4e10)
     assert {:ok, "1.4e23"} = JsonRs.encode(1.4e23)
   end
+
+  test "issue-90" do
+    issue_90 = File.read!("issue-90.json") |> Jason.decode!()
+    assert {:ok, _} = JsonRs.encode(issue_90)
+  end
 end

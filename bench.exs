@@ -1,5 +1,6 @@
 small = File.read!("example_small.json") |> Jason.decode!()
 large = File.read!("example_large.json") |> Jason.decode!()
+issue_90 = File.read!("issue-90.json") |> Jason.decode!()
 
 Benchee.run(
   %{
@@ -12,6 +13,7 @@ Benchee.run(
   },
   inputs: %{
     "33kB" => small,
-    "100kB" => large
+    "100kB" => large,
+    "issue-90" => issue_90
   }
 )

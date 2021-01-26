@@ -1,4 +1,4 @@
-defmodule RegexRs.MixProject do
+defmodule JsonRs.MixProject do
   use Mix.Project
 
   def project do

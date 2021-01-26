@@ -1,4 +1,4 @@
-# RegexRs
+# JsonRs
 
 ```
 (base) clark@doomguy:~/code/personal/json_rs$ MIX_ENV=bench mix run bench.exs

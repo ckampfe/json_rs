@@ -55,4 +55,52 @@ defmodule JsonRsTest do
     issue_90 = File.read!("issue-90.json") |> Jason.decode!()
     assert {:ok, _} = JsonRs.encode(issue_90)
   end
+
+  test "decode/1 null" do
+    assert {:ok, nil} == JsonRs.decode("null")
+  end
+
+  test "decode/1 bool" do
+    assert {:ok, true} == JsonRs.decode("true")
+    assert {:ok, false} == JsonRs.decode("false")
+  end
+
+  test "decode/1 number" do
+    assert {:ok, 40} == JsonRs.decode("40")
+    assert {:ok, -40} == JsonRs.decode("-40")
+    assert {:ok, 40.0} == JsonRs.decode("40.0")
+    assert {:ok, -40.0} == JsonRs.decode("-40.0")
+  end
+
+  test "decode/1 string" do
+    assert {:ok, "some string"} == JsonRs.decode("\"some string\"")
+  end
+
+  test "decode/1 array" do
+    assert {:ok, [1,2,3, "something", true, false, nil]} == JsonRs.decode("[1,2,3,\"something\",true,false,null]")
+  end
+
+  test "decode/1 object" do
+    assert {:ok, %{}} == JsonRs.decode("{}")
+
+    assert {:ok, %{
+      "abc" => 1,
+      "def" => true,
+      "ghi" => []
+    }} == JsonRs.decode("{\"abc\":1,\"def\":true,\"ghi\":[]}")
+  end
+
+  test "matches Jason" do
+    small_json = File.read!("example_small.json")
+    assert {:ok, _} = JsonRs.decode(small_json)
+    assert JsonRs.decode(small_json) == Jason.decode(small_json)
+
+    large_json = File.read!("example_large.json")
+    assert {:ok, _} = JsonRs.decode(large_json)
+    assert JsonRs.decode(large_json) == Jason.decode(large_json)
+
+    issue_90_json = File.read!("issue-90.json")
+    assert {:ok, _} = JsonRs.decode(issue_90_json)
+    assert JsonRs.decode(issue_90_json) == Jason.decode(issue_90_json)
+  end
 end

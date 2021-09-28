@@ -10,12 +10,16 @@ path = "src/lib.rs"
 crate-type = ["dylib"]
 
 [dependencies]
-num-bigint = { version = "0.3", features = ["serde"] }
-num-traits = "0.2.14"
+num-bigint = { version = "0.4", features = ["serde"] }
+num-traits = "0.2"
 serde = "1"
 serde_json = "1"
-rustler = "0.22.0-rc.0"
+rustler = "0.22.0"
 
 [profile.release]
+codegen-units = 1
+lto = true
+
+[profile.bench]
 codegen-units = 1
 lto = true

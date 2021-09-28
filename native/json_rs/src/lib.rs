@@ -37,8 +37,79 @@ fn encode(t: Term, pretty: bool) -> Result<(Atom, String), Error> {
 }
 
 #[rustler::nif]
-fn decode(s: &str) -> Result<Term, Error> {
-    todo!()
+fn decode(s: &str) -> Result<(Atom, SerdeOut), Error> {
+    let json: serde_json::Value = serde_json::from_str(s).map_err(|e| {
+        let r = e.to_string();
+        rustler::Error::RaiseTerm(Box::new(r))
+    })?;
+    Ok((crate::atoms::ok(), json.into()))
+}
+
+struct SerdeOut(serde_json::Value);
+
+impl From<serde_json::Value> for SerdeOut {
+    fn from(v: serde_json::Value) -> Self {
+        SerdeOut(v)
+    }
+}
+
+impl<'t> rustler::Encoder for SerdeOut {
+    fn encode<'a>(&self, env: rustler::Env<'a>) -> Term<'a> {
+        match &self.0 {
+            serde_json::Value::Null => rustler::types::atom::nil().encode(env),
+            serde_json::Value::Bool(b) => b.encode(env),
+            serde_json::Value::Number(n) => n
+                .as_u64()
+                .map(|n| n.encode(env))
+                .or_else(|| n.as_i64().map(|n| n.encode(env)))
+                .or_else(|| n.as_f64().map(|n| n.encode(env)))
+                .unwrap(),
+            serde_json::Value::String(s) => s.encode(env),
+            serde_json::Value::Array(a) => a
+                .iter()
+                .map(|v| SerdeOutRef(v).encode(env))
+                .collect::<Vec<Term>>()
+                .encode(env),
+            serde_json::Value::Object(ref o) => MyMap(o).encode(env),
+        }
+    }
+}
+
+struct SerdeOutRef<'t>(&'t serde_json::Value);
+
+impl<'t> rustler::Encoder for SerdeOutRef<'t> {
+    fn encode<'a>(&self, env: rustler::Env<'a>) -> Term<'a> {
+        match self.0 {
+            serde_json::Value::Null => rustler::types::atom::nil().encode(env),
+            serde_json::Value::Bool(b) => b.encode(env),
+            serde_json::Value::Number(n) => n
+                .as_u64()
+                .map(|n| n.encode(env))
+                .or_else(|| n.as_i64().map(|n| n.encode(env)))
+                .or_else(|| n.as_f64().map(|n| n.encode(env)))
+                .unwrap(),
+            serde_json::Value::String(s) => s.encode(env),
+            serde_json::Value::Array(a) => a
+                .iter()
+                .map(|v| SerdeOutRef(v).encode(env))
+                .collect::<Vec<Term>>()
+                .encode(env),
+            serde_json::Value::Object(o) => MyMap(o).encode(env),
+        }
+    }
+}
+
+struct MyMap<'t>(&'t serde_json::Map<String, serde_json::Value>);
+
+impl<'t> rustler::Encoder for MyMap<'t> {
+    fn encode<'c>(&self, env: rustler::Env<'c>) -> Term<'c> {
+        let (keys, values): (Vec<_>, Vec<_>) = self
+            .0
+            .iter()
+            .map(|(k, v)| (k.encode(env), SerdeOutRef(v).encode(env)))
+            .unzip();
+        Term::map_from_arrays(env, &keys, &values).unwrap()
+    }
 }
 
 struct SerdeTerm<'t>(Term<'t>);
@@ -144,7 +215,7 @@ impl<'t> serde::Serialize for SerdeTerm<'t> {
                                 num_bigint::Sign::Plus
                             };
 
-                            let sb = num_bigint::BigInt::from_radix_le(sign, &digits, 256).unwrap();
+                            let sb = num_bigint::BigInt::from_radix_le(sign, digits, 256).unwrap();
 
                             if let Some(i) = sb.to_u128() {
                                 return serializer.serialize_u128(i);
@@ -161,7 +232,7 @@ impl<'t> serde::Serialize for SerdeTerm<'t> {
                                 num_bigint::Sign::Plus
                             };
 
-                            let sb = num_bigint::BigInt::from_radix_le(sign, &digits, 256).unwrap();
+                            let sb = num_bigint::BigInt::from_radix_le(sign, digits, 256).unwrap();
 
                             if let Some(i) = sb.to_u128() {
                                 return serializer.serialize_u128(i);

@@ -8,7 +8,7 @@ defmodule JsonRs.MixProject do
       elixir: "~> 1.11",
       start_permanent: Mix.env() == :prod || Mix.env() == :bench,
       deps: deps(),
-      compilers: [:rustler] ++ Mix.compilers(),
+      compilers: Mix.compilers(),
       rustler_crates: rustler_crates()
     ]
   end
@@ -25,7 +25,7 @@ defmodule JsonRs.MixProject do
     [
       {:benchee, "~> 1.0", only: [:dev, :bench]},
       {:jason, "~> 1.2", only: [:dev, :test, :bench]},
-      {:rustler, "~> 0.22.0-rc.0"}
+      {:rustler, "~> 0.22.0"}
     ]
   end
 

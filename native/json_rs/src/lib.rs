@@ -9,7 +9,6 @@ const ETF_SMALL_BIG_TAG_BYTE: u8 = 110;
 const ETF_LARGE_BIG_TAG_BYTE: u8 = 111;
 
 mod atoms {
-    #[inline]
     rustler::atoms! {
         ok,
         error,

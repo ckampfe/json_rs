@@ -91,14 +91,6 @@ defmodule JsonRsTest do
   end
 
   test "matches Jason" do
-    small_json = File.read!("example_small.json")
-    assert {:ok, _} = JsonRs.decode(small_json)
-    assert JsonRs.decode(small_json) == Jason.decode(small_json)
-
-    large_json = File.read!("example_large.json")
-    assert {:ok, _} = JsonRs.decode(large_json)
-    assert JsonRs.decode(large_json) == Jason.decode(large_json)
-
     issue_90_json = File.read!("issue-90.json")
     assert {:ok, _} = JsonRs.decode(issue_90_json)
     assert JsonRs.decode(issue_90_json) == Jason.decode(issue_90_json)

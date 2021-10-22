@@ -77,17 +77,19 @@ defmodule JsonRsTest do
   end
 
   test "decode/1 array" do
-    assert {:ok, [1,2,3, "something", true, false, nil]} == JsonRs.decode("[1,2,3,\"something\",true,false,null]")
+    assert {:ok, [1, 2, 3, "something", true, false, nil]} ==
+             JsonRs.decode("[1,2,3,\"something\",true,false,null]")
   end
 
   test "decode/1 object" do
     assert {:ok, %{}} == JsonRs.decode("{}")
 
-    assert {:ok, %{
-      "abc" => 1,
-      "def" => true,
-      "ghi" => []
-    }} == JsonRs.decode("{\"abc\":1,\"def\":true,\"ghi\":[]}")
+    assert {:ok,
+            %{
+              "abc" => 1,
+              "def" => true,
+              "ghi" => []
+            }} == JsonRs.decode("{\"abc\":1,\"def\":true,\"ghi\":[]}")
   end
 
   test "matches Jason" do
